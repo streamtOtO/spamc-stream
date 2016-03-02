@@ -21,8 +21,8 @@ var net = require('net');
 var stream = require('stream');
 
 var patterns = {
-    processAll: /(\s|-)([0-9\.]+)\s([A-Z0-9\_]+)\s([^:]+)\:\s([^\n]+)/g,
-    process: /(\s|-)([0-9\.]+)\s([A-Z0-9\_]+)\s([^:]+)\:\s([^\s]+)/,
+    processAll: /(\s|-)([0-9\.]+)\s([A-Z0-9\_\:]+)\s([^\n]+)/g,
+    process   : /(\s|-)([0-9\.]+)\s([A-Z0-9\_\:]+)\s([^\n]+)/,
     // A fix proposed by hassansin @ https://github.com/Flolagale/spamc/commit/cf719a3436e57ff4d799eac1e58b06ab2260fbb1
     responseHead: /SPAMD\/([0-9\.\-]+)\s([0-9]+)\s([0-9A-Z_]+)/,
     response: /Spam:\s(True|False|Yes|No)\s;\s([0-9\.]+)\s\/\s([0-9\.]+)/
@@ -228,6 +228,7 @@ var spamc = function (host, port, timeout) {
      * Return: [{Error}, {Object}]
      */
     var processResponse = function (cmd, lines) {
+        //console.log('response ', lines);
         var returnObj = {};
         if(!lines[0]) return ["Could not match response", null];
         var result = lines[0].match(patterns.responseHead);
@@ -260,27 +261,34 @@ var spamc = function (host, port, timeout) {
                 }
             }
             if (result == null && cmd != 'PROCESS') {
+                //console.log('deb ', lines[i]);
                 result = lines[i].match(patterns.processAll);
+                //console.log('after ', result);
+                // if (result != null) {
+                //     returnObj.report = [];
+                //     for (var ii = 0; ii < result.length; ii++) {
+                //         returnObj.report[returnObj.report.length] = result[ii];
+                //     }
+                // }
                 if (result != null) {
                     returnObj.report = [];
                     for (var ii = 0; ii < result.length; ii++) {
                         /* Remove New Line if Found */
-                        result[ii] = result[ii].replace(/\n([\s]*)/, ' ');
                         /* Match Sections */
                         var matches = result[ii].match(patterns.process);
                         // Fixes a throw when Match fails
                         if(!matches) return [new Error("Could Not Match Response")];
-                        
+
                         returnObj.report[returnObj.report.length] = {
                             score: matches[2],
                             name: matches[3],
                             description: matches[4].replace(/^\s*([\S\s]*)\b\s*$/, '$1'),
-                            type: matches[5]
                         };
                     }
                 }
 
             }
+
             if (lines[i].indexOf('DidSet:') >= 0) {
                 returnObj.didSet = true;
             }
