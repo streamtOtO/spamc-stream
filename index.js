@@ -279,11 +279,13 @@ var spamc = function (host, port, timeout) {
                         // Fixes a throw when Match fails
                         if(!matches) return [new Error("Could Not Match Response")];
 
-                        returnObj.report[returnObj.report.length] = {
-                            score: matches[2],
-                            name: matches[3],
-                            description: matches[4].replace(/^\s*([\S\s]*)\b\s*$/, '$1'),
-                        };
+                        if (matches[3] != 'NO_RECEIVED' && matches[3] != 'NO_RELAYS') {
+                            returnObj.report[returnObj.report.length] = {
+                                score: matches[2],
+                                name: matches[3],
+                                description: matches[4].replace(/^\s*([\S\s]*)\b\s*$/, '$1'),
+                            };
+                        }
                     }
                 }
 
