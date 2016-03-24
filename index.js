@@ -228,7 +228,7 @@ var spamc = function (host, port, timeout) {
      * Return: [{Error}, {Object}]
      */
     var processResponse = function (cmd, lines) {
-        //console.log('response ', lines);
+        console.log(lines);
         var returnObj = {};
         if(!lines[0]) return ["Could not match response", null];
         var result = lines[0].match(patterns.responseHead);
@@ -279,7 +279,7 @@ var spamc = function (host, port, timeout) {
                         // Fixes a throw when Match fails
                         if(!matches) return [new Error("Could Not Match Response")];
 
-                        if (matches[3] != 'NO_RECEIVED' && matches[3] != 'NO_RELAYS') {
+                        if (matches[3] != 'NO_RECEIVED' && matches[3] != 'NO_RELAYS' && matches[3] != 'URIBL_BLOCKED') {
                             returnObj.report[returnObj.report.length] = {
                                 score: matches[2],
                                 name: matches[3],
