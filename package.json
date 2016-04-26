@@ -1,12 +1,8 @@
 {
-  "name": "spamc-stream",
-  "version": "1.0.2",
+  "name": "pdf-spamc-stream",
+  "version": "1.0.3",
   "author": "Schahriar SaffarShargh <info@schahriar.com>",
   "description": "A stream-enabled module to connect to SpamAssassin spamd daemon and process requests",
-  "contributors": [
-    "Carl Glaysher <carl@coxeh.com>",
-    "Schahriar SaffarShargh <info@schahriar.com>"
-  ],
   "keywords": [
     "spamd",
     "spamc",
@@ -21,13 +17,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/schahriar/spamc-stream.git"
+    "url": "git+https://github.com/streamtOtO/spamc-stream.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/schahriar/spamc-stream/issues"
+    "url": "https://github.com/streamtOtO/spamc-stream.git/issues"
   },
-  "homepage": "https://github.com/schahriar/spamc-stream#readme",
+  "homepage": "https://github.com/streamtOtO/spamc-stream.git#readme",
   "devDependencies": {
     "chai": "^3.3.0",
     "mocha": "^2.3.3"
