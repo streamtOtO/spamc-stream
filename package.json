@@ -1,6 +1,6 @@
 {
   "name": "pdf-spamc-stream",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": "Schahriar SaffarShargh <info@schahriar.com>",
   "description": "A stream-enabled module to connect to SpamAssassin spamd daemon and process requests",
   "keywords": [
