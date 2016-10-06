@@ -78,5 +78,10 @@ spam.pipe(reporter);
 // ...
 ```
 
+
+## Changelog
+
+`1.0.5` Change iterate arrays from for loops to  forEach. Comment on if checkers of result == null, because give bad results.
+
 ## License
 This module is heavily based on work of Carl Glaysher and who doesn't love the [MIT license](https://raw.githubusercontent.com/schahriar/blackwall/master/LICENSE)?

@@ -26,7 +26,7 @@ var patterns = {
     // A fix proposed by hassansin @ https://github.com/Flolagale/spamc/commit/cf719a3436e57ff4d799eac1e58b06ab2260fbb1
     responseHead: /SPAMD\/([0-9\.\-]+)\s([0-9]+)\s([0-9A-Z_]+)/,
     response: /Spam:\s(True|False|Yes|No)\s;\s([0-9\.]+)\s\/\s([0-9\.]+)/
-}
+};
 
 var spamc = function (host, port, timeout) {
     var self = this;
@@ -219,7 +219,7 @@ var spamc = function (host, port, timeout) {
         });
         stream.on('close', function () {
             if(callback) callback(null, responseData);
-        })
+        });
     };
     /*
      * Description: Processes Response from spamd and put into a formatted object
@@ -241,8 +241,8 @@ var spamc = function (host, port, timeout) {
             returnObj.didSet = false;
             returnObj.didRemove = false;
         }
-        for (var i = 0; i < lines.length; i++) {
-            result = lines[i].match(patterns.response);
+        lines.forEach(function(key) {
+            result = key.match(patterns.response);
             if (result != null) {
                 returnObj.isSpam = false;
                 if (result[1] == 'True' || result[1] == 'Yes') {
@@ -251,53 +251,55 @@ var spamc = function (host, port, timeout) {
                 returnObj.spamScore = parseFloat(result[2]);
                 returnObj.baseSpamScore = parseFloat(result[3]);
             }
-            if (result == null) {
-                result = lines[i].match(/([A-Z0-9\_]+)\,/g);
-                if (result != null) {
-                    returnObj.matches = [];
-                    for (var ii = 0; ii < result.length; ii++) {
-                        returnObj.matches[ii] = result[ii].substring(0, result[ii].length - 1);
-                    }
-                }
-            }
+
+            // This commented if give wrong results on some creatives like: matches = ['1'];, so i disabled it.
+            // if (result == null) {
+            //     result = key.match(/([A-Z0-9\_]+)\,/g);
+            //     if (result != null) {
+            //         returnObj.matches = [];
+            //         for (var ii = 0; ii < result.length; ii++) {
+            //             returnObj.matches[ii] = result[ii].substring(0, result[ii].length - 1);
+            //         }
+            //     }
+            // }
+
             if (result == null && cmd != 'PROCESS') {
-                //console.log('deb ', lines[i]);
-                result = lines[i].match(patterns.processAll);
-                //console.log('after ', result);
+                result = key.match(patterns.processAll);
                 // if (result != null) {
                 //     returnObj.report = [];
                 //     for (var ii = 0; ii < result.length; ii++) {
                 //         returnObj.report[returnObj.report.length] = result[ii];
                 //     }
                 // }
+
                 if (result != null) {
                     returnObj.report = [];
-                    for (var ii = 0; ii < result.length; ii++) {
+                    result.forEach(function(key) {
                         /* Remove New Line if Found */
                         /* Match Sections */
-                        var matches = result[ii].match(patterns.process);
+                        var matches = key.match(patterns.process);
                         // Fixes a throw when Match fails
                         if(!matches) return [new Error("Could Not Match Response")];
-
                         if (matches[3] != 'NO_RECEIVED' && matches[3] != 'NO_RELAYS' && matches[3] != 'URIBL_BLOCKED') {
-                            returnObj.report[returnObj.report.length] = {
+                            var obj = {
                                 score: matches[2],
                                 name: matches[3],
                                 description: matches[4].replace(/^\s*([\S\s]*)\b\s*$/, '$1'),
                             };
+                            returnObj.report.push(obj);
                         }
-                    }
+                    });
                 }
 
             }
 
-            if (lines[i].indexOf('DidSet:') >= 0) {
+            if (key.indexOf('DidSet:') >= 0) {
                 returnObj.didSet = true;
             }
-            if (lines[i].indexOf('DidRemove:') >= 0) {
+            if (key.indexOf('DidRemove:') >= 0) {
                 returnObj.didRemove = true;
             }
-        }
+        });
         if (cmd == 'PROCESS') {
             returnObj.message = '';
             for (var i = 3; i < lines.length; i++) {
